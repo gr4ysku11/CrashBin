@@ -7,7 +7,9 @@ namespace CrashBin
     {
         static void Main(string[] args)
         {
-            //TODO: parse command line params, mainly '-in' for crash file input directory
+            //TODO: parse command line params
+            // separate params from target application
+
             //TODO: read input directory and loop through crash files
 
             ProcessStartInfo pi = new ProcessStartInfo();
@@ -33,9 +35,15 @@ namespace CrashBin
             string exploitability = Regex.Match(output, @"Exploitability Classification: ([^\n]+)").Groups[1].Value;
             string hash = Regex.Match(output, @"Hash=([^\)]+)").Groups[1].Value;
 
-            //TODO: add sqlite processing
-
             System.Console.WriteLine(output);
+
+            //TODO: add sqlite processing
+            // create db
+            // check for duplicates
+            // store details
+
+            //TODO: copy dedup crash files to output directory
+            // create output sub directories for exploitability classification (exploitable, unknown, etc)?
         }
     }
 }
