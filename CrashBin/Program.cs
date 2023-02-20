@@ -7,11 +7,6 @@ namespace CrashBin
     {
         static void Main(string[] args)
         {
-            string output = "";
-            string exploitability = "";
-            string hash = "";
-            string eip = "";
-
             //TODO: parse command line params, mainly '-in' for crash file input directory
             //TODO: read input directory and loop through crash files
 
@@ -31,12 +26,12 @@ namespace CrashBin
             pi.UseShellExecute = false;
 
             Process p = Process.Start(pi);
-            output = p.StandardOutput.ReadToEnd();
 
-            eip = $"0x{Regex.Match(output, "eip=([0-9a-f]{8})").Groups[1].Value}";
-            output = Regex.Match(output, @"Last event:.*?: (.*)quit:", RegexOptions.Singleline).Groups[1].Value;
-            exploitability = Regex.Match(output, @"Exploitability Classification: ([^\n]+)").Groups[1].Value;
-            hash = Regex.Match(output, @"Hash=([^\)]+)").Groups[1].Value;
+            string output = p.StandardOutput.ReadToEnd();
+            string eip = $"0x{Regex.Match(output, "eip=([0-9a-f]{8})").Groups[1].Value}";
+            string details = Regex.Match(output, @"Last event:.*?: (.*)quit:", RegexOptions.Singleline).Groups[1].Value;
+            string exploitability = Regex.Match(output, @"Exploitability Classification: ([^\n]+)").Groups[1].Value;
+            string hash = Regex.Match(output, @"Hash=([^\)]+)").Groups[1].Value;
 
             //TODO: add sqlite processing
 
