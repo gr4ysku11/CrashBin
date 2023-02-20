@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CrashBin": {
+      "commandName": "Project",
+      "commandLineArgs": "notepad.exe"
+    }
+  }
+}
