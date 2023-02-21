@@ -34,6 +34,7 @@ namespace CrashBin
 
                 Process p = Process.Start(pi);
 
+                // use regex to grab specific details from cdb/exploitable
                 string output = p.StandardOutput.ReadToEnd();
                 string eip = $"0x{Regex.Match(output, "eip=([0-9a-f]{8})").Groups[1].Value}";
                 string details = Regex.Match(output, @"Last event:.*?: (.*)quit:", RegexOptions.Singleline).Groups[1].Value;
@@ -57,17 +58,22 @@ namespace CrashBin
             outDir = "";
             targetApp = "";
 
-            List<string> argsList = args.ToList();
+            // flatten args array into one string for simple regex matching
+            string cmdLine = String.Join(" ", args);
 
             try
             {
-                inDir = args[argsList.FindIndex(x => x.Equals("-in")) + 1];
-                outDir = args[argsList.FindIndex(x => x.Equals("-out")) + 1];
-                targetApp = args[argsList.FindIndex(x => x.Equals("--")) + 1];
+                inDir = Regex.Match(cmdLine, @"-in ([^ ]+)").Groups[1].Value;
+                outDir = Regex.Match(cmdLine, @"-out ([^ ]+)").Groups[1].Value;
+                targetApp = Regex.Match(cmdLine, @"-- ([^ ]+)").Groups[1].Value;
+
+                if(inDir == "" || outDir == "" || targetApp == "")
+                    throw new Exception();
             }
             catch (Exception ex)
             {
                 printUsage();
+                System.Environment.Exit(0);
             }
         }
         static void printUsage()
