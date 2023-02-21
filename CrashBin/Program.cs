@@ -19,6 +19,11 @@ namespace CrashBin
             //TODO: use env instead of hardcode path?
             pi.FileName = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
 
+            // create new crashbin db file
+            //TODO: check for existing db?
+            CrashbinContext crashbin = new CrashbinContext();
+            crashbin.Database.EnsureCreated();
+
             // loop through crash file directory
             foreach (string file in Directory.GetFiles(inDir))
             {
@@ -43,14 +48,19 @@ namespace CrashBin
 
                 System.Console.WriteLine(output);
 
-                //TODO: add sqlite processing
-                // create db
-                // check for duplicates
-                // store details
+                //TODO: check for duplicates
+                Crash crash = new Crash();
+                crash.Details = details;
+                crash.Exploitability = exploitability;
+                crash.File = file;
+                crash.Hash = hash;
+
+                crashbin.Add(crash);
 
                 //TODO: copy dedup crash files to output directory
                 // create output sub directories for exploitability classification (exploitable, unknown, etc)?
             }
+            crashbin.SaveChanges();
         }
         static void parseCmdLine(string[] args, out string inDir, out string outDir, out string targetApp)
         {
