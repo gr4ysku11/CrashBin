@@ -26,7 +26,7 @@ namespace CrashBin
                 // stop at initial breakpoint for testing
                 pi.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
 #else
-            pi.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
+                pi.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
 #endif
 
                 pi.RedirectStandardOutput = true;
