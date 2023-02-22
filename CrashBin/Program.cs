@@ -49,7 +49,7 @@ namespace CrashBin
                 string exploitability = Regex.Match(output, @"Exploitability Classification: ([^\n]+)").Groups[1].Value;
                 string hash = Regex.Match(output, @"Hash=([^\)]+)").Groups[1].Value;
 
-                System.Console.WriteLine(output);
+                System.Console.WriteLine(details);
 
                 // check for duplicates based on hash
                 List<Crash> dupCrashes = crashbin.Crashes.Where(x => x.Hash == hash).ToList();
