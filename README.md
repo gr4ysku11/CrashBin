@@ -9,5 +9,5 @@ CrashBin automates the process of triaging crash files produced during fuzzing c
 ## Running CrashBin
 
 ```
-CrashBin.exe -in <crash file directory> -out <output directory> -- <application.exe> @@
+CrashBin.exe -in <crash file directory> -out <output directory> -- <application.exe>
 ```
