@@ -14,10 +14,12 @@ namespace CrashBin
             string targetApp;
             parseCmdLine(args, out inDir, out outDir, out targetApp);
 
-            ProcessStartInfo pi = new ProcessStartInfo();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
 
             //TODO: use env instead of hardcode path?
-            pi.FileName = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
+            startInfo.FileName = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
+            startInfo.RedirectStandardOutput = true;
+            startInfo.UseShellExecute = false;
 
             // create new crashbin db file
             //TODO: check for existing db?
@@ -29,18 +31,18 @@ namespace CrashBin
             {
 #if DEBUG
                 // stop at initial breakpoint for testing
-                pi.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
+                startInfo.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
 #else
-                pi.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
+                startInfo.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
 #endif
-
-                pi.RedirectStandardOutput = true;
-                pi.UseShellExecute = false;
+                Process process = new Process();
+                process.StartInfo = startInfo;
+                process.Start();
 
                 Process p = Process.Start(pi);
 
                 // use regex to grab specific details from cdb/exploitable
-                string output = p.StandardOutput.ReadToEnd();
+                string output = process.StandardOutput.ReadToEnd();
                 string eip = $"0x{Regex.Match(output, "eip=([0-9a-f]{8})").Groups[1].Value}";
                 string details = Regex.Match(output, @"Last event:.*?: (.*)quit:", RegexOptions.Singleline).Groups[1].Value;
                 string exploitability = Regex.Match(output, @"Exploitability Classification: ([^\n]+)").Groups[1].Value;
