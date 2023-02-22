@@ -20,19 +20,23 @@ namespace CrashBin
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
 
+            // get file list before db creation
+            List<string> fileList = Directory.GetFiles(inDir).ToList();
+
             // create new crashbin db file
             //TODO: check for existing db?
             CrashbinContext crashbin = new CrashbinContext();
             crashbin.Database.EnsureCreated();
 
             // loop through crash file directory
-            foreach (string file in Directory.GetFiles(inDir))
+            foreach (string file in fileList)
             {
+                string fullFilePath = Path.GetFullPath(file);
 #if DEBUG
                 // stop at initial breakpoint for testing
-                startInfo.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
+                startInfo.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {fullFilePath}";
 #else
-                startInfo.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
+                startInfo.Arguments = $"-x -g -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {fullFilePath}";
 #endif
                 Process process = new Process();
                 process.StartInfo = startInfo;
@@ -57,7 +61,7 @@ namespace CrashBin
                 Crash crash = new Crash();
                 crash.Details = details;
                 crash.Exploitability = exploitability;
-                crash.File = Path.GetFullPath(file);
+                crash.File = fullFilePath;
                 crash.Hash = hash;
 
                 // add crash to bin
