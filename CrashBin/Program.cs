@@ -48,19 +48,27 @@ namespace CrashBin
 
                 System.Console.WriteLine(output);
 
-                //TODO: check for duplicates
+                // check for duplicates
+                List<Crash> dupCrashes = crashbin.Crashes.Where(x => x.Hash == hash).ToList();
+
+                if(dupCrashes.Count > 0 )
+                    continue;
+
+                // process new crash
                 Crash crash = new Crash();
                 crash.Details = details;
                 crash.Exploitability = exploitability;
                 crash.File = file;
                 crash.Hash = hash;
 
+                // add crash to bin
                 crashbin.Add(crash);
+
+                crashbin.SaveChanges();
 
                 //TODO: copy dedup crash files to output directory
                 // create output sub directories for exploitability classification (exploitable, unknown, etc)?
             }
-            crashbin.SaveChanges();
         }
         static void parseCmdLine(string[] args, out string inDir, out string outDir, out string targetApp)
         {
