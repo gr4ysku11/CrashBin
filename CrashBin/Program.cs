@@ -15,7 +15,6 @@ namespace CrashBin
             parseCmdLine(args, out inDir, out outDir, out targetApp);
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-
             //TODO: use env instead of hardcode path?
             startInfo.FileName = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
             startInfo.RedirectStandardOutput = true;
@@ -29,6 +28,7 @@ namespace CrashBin
             // loop through crash file directory
             foreach (string file in Directory.GetFiles(inDir))
             {
+                string fullFile = Path.Combine(Path.GetFullPath(file), Path.GetFileName(file));
 #if DEBUG
                 // stop at initial breakpoint for testing
                 startInfo.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
@@ -38,8 +38,6 @@ namespace CrashBin
                 Process process = new Process();
                 process.StartInfo = startInfo;
                 process.Start();
-
-                Process p = Process.Start(pi);
 
                 // use regex to grab specific details from cdb/exploitable
                 string output = process.StandardOutput.ReadToEnd();
@@ -60,7 +58,7 @@ namespace CrashBin
                 Crash crash = new Crash();
                 crash.Details = details;
                 crash.Exploitability = exploitability;
-                crash.File = file;
+                crash.File = fullFile;
                 crash.Hash = hash;
 
                 // add crash to bin
@@ -72,7 +70,7 @@ namespace CrashBin
                 Directory.CreateDirectory($"{outDir}/{exploitability}");
 
                 // remove path prefix from file
-                string trimFile = file.Substring(file.LastIndexOf('\\')+1);
+                string trimFile = Path.GetFileName(file);
 
                 // copy dedup crash files to output directory
                 File.Copy(file, $"{outDir}/{exploitability}/{trimFile}");
