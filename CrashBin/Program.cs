@@ -28,7 +28,6 @@ namespace CrashBin
             // loop through crash file directory
             foreach (string file in Directory.GetFiles(inDir))
             {
-                string fullFile = Path.Combine(Path.GetFullPath(file), Path.GetFileName(file));
 #if DEBUG
                 // stop at initial breakpoint for testing
                 startInfo.Arguments = $"-x -c \".lastevent; r; kv8; !load msec; !exploitable; q\" {targetApp} {file}";
@@ -58,7 +57,7 @@ namespace CrashBin
                 Crash crash = new Crash();
                 crash.Details = details;
                 crash.Exploitability = exploitability;
-                crash.File = fullFile;
+                crash.File = Path.GetFullPath(file);
                 crash.Hash = hash;
 
                 // add crash to bin
