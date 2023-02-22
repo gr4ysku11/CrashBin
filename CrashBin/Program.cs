@@ -48,7 +48,7 @@ namespace CrashBin
 
                 System.Console.WriteLine(output);
 
-                // check for duplicates
+                // check for duplicates based on hash
                 List<Crash> dupCrashes = crashbin.Crashes.Where(x => x.Hash == hash).ToList();
 
                 if(dupCrashes.Count > 0 )
@@ -63,11 +63,17 @@ namespace CrashBin
 
                 // add crash to bin
                 crashbin.Add(crash);
-
                 crashbin.SaveChanges();
 
-                //TODO: copy dedup crash files to output directory
                 // create output sub directories for exploitability classification (exploitable, unknown, etc)?
+                Directory.CreateDirectory(outDir);
+                Directory.CreateDirectory($"{outDir}/{exploitability}");
+
+                // remove path prefix from file
+                string trimFile = file.Substring(file.LastIndexOf('\\')+1);
+
+                // copy dedup crash files to output directory
+                File.Copy(file, $"{outDir}/{exploitability}/{trimFile}");
             }
         }
         static void parseCmdLine(string[] args, out string inDir, out string outDir, out string targetApp)
