@@ -16,7 +16,14 @@ namespace CrashBin
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //TODO: use env instead of hardcode path?
-            startInfo.FileName = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
+
+            string cdbPath = "";
+#if x64
+            cdbPath = @"c:\program files (x86)\windows kits\10\debuggers\x64\cdb.exe";
+#else
+            cdbPath = @"c:\program files (x86)\windows kits\10\debuggers\x86\cdb.exe";
+#endif
+            startInfo.FileName= cdbPath;
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
 
